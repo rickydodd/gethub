@@ -62,3 +62,17 @@
   border: none;
   background-color: rgba(255, 255, 255, 1);
 }
+
+#selectedOutputDirectory {
+  margin-top: 10px;
+  border: 1px solid white;
+}
+
+#selectedOutputDirectory p {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;
+}

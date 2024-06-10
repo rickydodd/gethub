@@ -26,11 +26,20 @@ function App() {
   }
 
   function selectDirectory() {
-    SelectDirectory().then(updateSelectedDirectory)
+    SelectDirectory()
+      .then(updateSelectedDirectory)
+      .then(renderSelectedDirectory)
   }
 
   function backupRepositories() {
     BackupRepositories(username, selectedDirectory).then(updateResultText)
+  }
+
+  function renderSelectedDirectory() {
+    if (selectedDirectory !== '') {
+      return <p>{selectedDirectory}&lrm;</p>
+    }
+    return <p>No output folder selected.&lrm;</p>
   }
 
   return (
@@ -63,7 +72,7 @@ function App() {
         >
           Choose Output Folder
         </button>
-        <br />
+        <div id="selectedOutputDirectory">{renderSelectedDirectory()}</div>
         <br />
         <label htmlFor="archiveAndCompressionMethod">
           Choose an archive and compression method:
