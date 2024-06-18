@@ -10,6 +10,10 @@ export function BackupRepositories(arg1, arg2, arg3) {
   return window['go']['main']['App']['BackupRepositories'](arg1, arg2, arg3);
 }
 
+export function DefaultArchiveCompressionOption() {
+  return window['go']['main']['App']['DefaultArchiveCompressionOption']();
+}
+
 export function SelectDirectory() {
   return window['go']['main']['App']['SelectDirectory']();
 }

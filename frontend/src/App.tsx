@@ -2,6 +2,7 @@ import { useState } from 'react'
 import logo from './assets/images/gethub_logo.svg'
 import './App.css'
 import {
+  DefaultArchiveCompressionOption,
   ArchiveCompressionOptions,
   SelectDirectory,
   BackupRepositories,
@@ -29,6 +30,10 @@ function App() {
   const updateArchiveCompressionOption = (e: any) =>
     setArchiveCompressionOption(e.target.value)
 
+  function getDefaultArchiveCompressionOption() {
+    DefaultArchiveCompressionOption().then(setArchiveCompressionOption)
+  }
+
   function getArchiveCompressionOptions() {
     ArchiveCompressionOptions().then(updateArchiveCompressionOptions)
   }
@@ -53,6 +58,8 @@ function App() {
     }
     return <p>No output folder selected.&lrm;</p>
   }
+
+  getDefaultArchiveCompressionOption()
 
   return (
     <div id="App">
@@ -92,7 +99,6 @@ function App() {
           Choose an archive and compression method:
         </label>
         <br />
-        {archiveCompressionOption}
         <select
           id="archiveAndCompressionMethod"
           className="input"

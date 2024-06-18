@@ -34,6 +34,15 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+func (a *App) DefaultArchiveCompressionOption() string {
+	switch defaultRuntime.GOOS {
+	case "windows":
+		return "zip"
+	default:
+		return "tar/gzip"
+	}
+}
+
 // ArchiveCompressionOptions returns archive/compression options,
 // ordered in an operating system specific way.
 func (a *App) ArchiveCompressionOptions() []string {
