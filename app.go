@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"compress/gzip"
 	"context"
 	"errors"
@@ -38,9 +39,9 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) ArchiveCompressionOptions() []string {
 	switch defaultRuntime.GOOS {
 	case "windows":
-		return []string{"tar/gzip"}
+		return []string{"zip", "tar/gzip"}
 	default:
-		return []string{"tar/gzip"}
+		return []string{"tar/gzip", "zip"}
 	}
 }
 
@@ -57,7 +58,9 @@ func (a *App) SelectDirectory() string {
 
 // BackupRepositories clones all repositories belonging to `username` locally,
 // then compresses and archives them to `{outputPath}/{username}.tar.gz`
-func (a *App) BackupRepositories(username, outputPath string) string {
+func (a *App) BackupRepositories(username, outputPath, archiveCompressionOption string) string {
+	var file *os.File
+
 	client := github.NewClient(nil)
 
 	// Get a list of all repositories of `username`, in `repos`.
@@ -78,10 +81,19 @@ func (a *App) BackupRepositories(username, outputPath string) string {
 	}
 	defer removeAll(userPath)
 
-	// Create tarball file.
-	file, err := os.Create(fmt.Sprintf("%s%s.tar.gz", outputPath, username))
-	if err != nil {
-		return err.Error()
+	switch archiveCompressionOption {
+	case "tar/gzip":
+		file, err = os.Create(fmt.Sprintf("%s/%s.tar.gz", outputPath, username))
+		if err != nil {
+			return err.Error()
+		}
+	case "zip":
+		file, err = os.Create(fmt.Sprintf("%s/%s.zip", outputPath, username))
+		if err != nil {
+			return err.Error()
+		}
+	default:
+		return "Invalid archive and compression method."
 	}
 	defer file.Close()
 
@@ -97,8 +109,15 @@ func (a *App) BackupRepositories(username, outputPath string) string {
 		return err.Error()
 	}
 
-	if err = tarGzip(".", file); err != nil {
-		return err.Error()
+	switch archiveCompressionOption {
+	case "tar/gzip":
+		if err = tarGzip(".", file); err != nil {
+			return err.Error()
+		}
+	case "zip":
+		if err = zipCompress(".", file); err != nil {
+			return err.Error()
+		}
 	}
 
 	return fmt.Sprintf("Repositories successfully backed up!")
@@ -184,6 +203,48 @@ func tarGzip(path string, buffer io.Writer) error {
 
 			return nil
 		})
+	}
+
+	return nil
+}
+
+func zipCompress(path string, buffer io.Writer) error {
+	zipWriter := zip.NewWriter(buffer)
+	defer zipWriter.Close()
+
+	walker := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			path = fmt.Sprintf("%s%c", path, os.PathSeparator)
+			_, err = zipWriter.Create(path)
+			return err
+		}
+
+		data, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer data.Close()
+
+		file, err := zipWriter.Create(path)
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(file, data)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	err := filepath.Walk(path, walker)
+	if err != nil {
+		return err
 	}
 
 	return nil

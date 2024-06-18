@@ -14,12 +14,16 @@ function App() {
   const [archiveCompressionOptions, setArchiveCompressionOptions] = useState<
     string[]
   >([])
+  const [archiveCompressionOption, setArchiveCompressionOption] = useState('')
+
   const updateUsername = (e: any) => setUsername(e.target.value)
   const updateResultText = (result: string) => setResultText(result)
   const updateSelectedDirectory = (result: string) =>
     setSelectedDirectory(result)
   const updateArchiveCompressionOptions = (items: string[]) =>
     setArchiveCompressionOptions(items)
+  const updateArchiveCompressionOption = (e: any) =>
+    setArchiveCompressionOption(e.target.value)
 
   function getArchiveCompressionOptions() {
     ArchiveCompressionOptions().then(updateArchiveCompressionOptions)
@@ -32,7 +36,11 @@ function App() {
   }
 
   function backupRepositories() {
-    BackupRepositories(username, selectedDirectory).then(updateResultText)
+    BackupRepositories(
+      username,
+      selectedDirectory,
+      archiveCompressionOption,
+    ).then(updateResultText)
   }
 
   function renderSelectedDirectory() {
@@ -78,7 +86,12 @@ function App() {
           Choose an archive and compression method:
         </label>
         <br />
-        <select id="archiveAndCompressionMethod" className="input">
+        {archiveCompressionOption}
+        <select
+          id="archiveAndCompressionMethod"
+          className="input"
+          onChange={(e) => setArchiveCompressionOption(e.target.value)}
+        >
           {
             (getArchiveCompressionOptions(),
             archiveCompressionOptions.map((item, index) => (

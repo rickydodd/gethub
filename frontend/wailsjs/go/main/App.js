@@ -6,8 +6,8 @@ export function ArchiveCompressionOptions() {
   return window['go']['main']['App']['ArchiveCompressionOptions']();
 }
 
-export function BackupRepositories(arg1, arg2) {
-  return window['go']['main']['App']['BackupRepositories'](arg1, arg2);
+export function BackupRepositories(arg1, arg2, arg3) {
+  return window['go']['main']['App']['BackupRepositories'](arg1, arg2, arg3);
 }
 
 export function SelectDirectory() {

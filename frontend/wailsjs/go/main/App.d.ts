@@ -3,6 +3,6 @@
 
 export function ArchiveCompressionOptions():Promise<Array<string>>;
 
-export function BackupRepositories(arg1:string,arg2:string):Promise<string>;
+export function BackupRepositories(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function SelectDirectory():Promise<string>;
