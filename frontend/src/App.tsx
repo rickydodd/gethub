@@ -6,8 +6,10 @@ import {
   SelectDirectory,
   BackupRepositories,
 } from '../wailsjs/go/main/App'
+import LoadingScreen from './components/loading-screen'
 
 function App() {
+  const [loadingScreenState, setLoadingScreenState] = useState(false)
   const [resultText, setResultText] = useState('')
   const [selectedDirectory, setSelectedDirectory] = useState('')
   const [username, setUsername] = useState('')
@@ -16,6 +18,8 @@ function App() {
   >([])
   const [archiveCompressionOption, setArchiveCompressionOption] = useState('')
 
+  const invertLoadingScreenState = () =>
+    setLoadingScreenState((previousState) => !previousState)
   const updateUsername = (e: any) => setUsername(e.target.value)
   const updateResultText = (result: string) => setResultText(result)
   const updateSelectedDirectory = (result: string) =>
@@ -36,11 +40,11 @@ function App() {
   }
 
   function backupRepositories() {
-    BackupRepositories(
-      username,
-      selectedDirectory,
-      archiveCompressionOption,
-    ).then(updateResultText)
+    invertLoadingScreenState()
+
+    BackupRepositories(username, selectedDirectory, archiveCompressionOption)
+      .then(updateResultText)
+      .then(invertLoadingScreenState)
   }
 
   function renderSelectedDirectory() {
@@ -52,6 +56,8 @@ function App() {
 
   return (
     <div id="App">
+      <LoadingScreen isActive={loadingScreenState} />
+
       <img src={logo} id="logo" alt="logo" />
       <div id="result" className="result">
         {resultText}
